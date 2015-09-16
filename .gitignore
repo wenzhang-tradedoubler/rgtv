@@ -1,0 +1,16 @@
+.*.un~
+.*.swp
+*.iml
+*.ipr
+*.iws
+target
+.classpath
+.project
+.settings
+.idea/
+.DS_Store
+logs
+index/data
+local_tmp
+/history
+/bin
