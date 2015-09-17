@@ -5,26 +5,26 @@ package com.tradedoubler.rgtv.dto;
  */
 public class RgtvMessage {
     private Integer type;
-    private float lat;
-    private float lng;
+    private Float lat;
+    private Float lng;
     private Integer event;
     private Long click;
     private Long trackback;
 
 
-    public float getLat() {
+    public Float getLat() {
         return lat;
     }
 
-    public void setLat(float lat) {
+    public void setLat(Float lat) {
         this.lat = lat;
     }
 
-    public float getLng() {
+    public Float getLng() {
         return lng;
     }
 
-    public void setLng(float lng) {
+    public void setLng(Float lng) {
         this.lng = lng;
     }
 

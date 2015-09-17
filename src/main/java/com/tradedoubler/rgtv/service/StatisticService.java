@@ -45,7 +45,6 @@ public class StatisticService {
         rgtvMessage.setClick(statistics.get(CLICK_KEY));
         rgtvMessage.setTrackback(statistics.get(TRACK_BACK_KEY));
         messageChannel.send(MessageBuilder.withPayload(rgtvMessage).build());
-
     }
 
     public void addClick() {
