@@ -35,10 +35,24 @@ public class IPResolveService {
     @PostConstruct
     public void preLoadCache() {
         Cache cache = cacheManager.getCache("ipLocationCache");
-        LocationGet locationGet = new LocationGet();
-        locationGet.setLatitude(43.8338f);
-        locationGet.setLongitude(4.3596f);
-        cache.put("146.19.37.102", locationGet);
+//        Properties properties = new Properties();
+//        try {
+//            properties.load(new FileInputStream("ip.properties"));
+//            Set<String> names = properties.stringPropertyNames();
+//            for(String name : names){
+//                String[] location = String.valueOf(properties.get(name)).split(",");
+//                if(location == null || location.length == 0){
+//                  throw new Exception("Can not parse ip location for "+name);
+//                }
+//                LocationGet loc = new LocationGet();
+//                loc.setLatitude(Float.parseFloat(location[0]));
+//                loc.setLongitude(Float.parseFloat(location[1]));
+//                cache.put(name, loc);
+//            }
+//        } catch (Exception e) {
+//            LOGGER.error("Can not pre-load ip properties "+ e);
+//            e.printStackTrace();
+//        }
     }
 
     @Cacheable(value="ipLocationCache", key="#ip")
@@ -51,6 +65,7 @@ public class IPResolveService {
             LOGGER.info("Resolve location for IP "+ ip);
             return locationGet;
         } catch (HttpClientErrorException ex) {
+            LOGGER.error("Can not resolve IP "+ ip);
             ex.printStackTrace();
         }
         return null;

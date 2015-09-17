@@ -17,7 +17,7 @@ sock.onmessage = function (e) {
         //Handle statistics
         var numClicks = data.click;
         var numTrackbacks = data.trackback;
-        eventStatistics(numClicks, numTrackbacks);
+        updateStatistics(numClicks, numTrackbacks);
     }
 };
 

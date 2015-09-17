@@ -19,13 +19,13 @@ $(function () {
                     load: function () {
                         var series0 = this.series[0];
                         setInterval(function () {
-                            var x = (new Date()).getTime(), // current time
+                            var x = (new Date()).getTime(),
                                 y = hc_clicks;
                             series0.addPoint([x, y], true, true);
                         }, 1000);
                         var series1 = this.series[1];
                         setInterval(function () {
-                            var x = (new Date()).getTime(), // current time
+                            var x = (new Date()).getTime(),
                                 y = hc_trackbacks;
                             series1.addPoint([x, y], true, true);
                         }, 1000);
@@ -64,7 +64,6 @@ $(function () {
                 name: 'Click',
                 color: '#96F70D',
                 data: (function () {
-                    // generate an array of random data
                     var data = [],
                         time = (new Date()).getTime(),
                         i;
@@ -80,7 +79,6 @@ $(function () {
                 name: 'Trackback',
                 color: '#D21F1F',
                 data: (function () {
-                    // generate an array of random data
                     var data = [],
                         time = (new Date()).getTime(),
                         i;
@@ -97,7 +95,7 @@ $(function () {
     });
 });
 
-function eventStatistics(numClicks, numTrackbacks) {
+function updateStatistics(numClicks, numTrackbacks) {
     hc_clicks = numClicks;
     hc_trackbacks = numTrackbacks;
 }

@@ -3,7 +3,8 @@ var markers = [];
 
 function initMap() {
     //Style map.
-    var customMapType = new google.maps.StyledMapType([{
+    var rgtvMapTypeId = 'rgtvMapTypeId';
+    var rgtvMapType = new google.maps.StyledMapType([{
         stylers: [{
             gamma: 0.68
         }, {
@@ -42,12 +43,12 @@ function initMap() {
             lat: 59.341112,
             lng: 18.064447
         },
-          zoom: 3,
-          mapTypeId: [google.maps.MapTypeId.TERRAIN, customMapTypeId] 
+          zoom: 2,
+          mapTypeId: [google.maps.MapTypeId.TERRAIN, rgtvMapTypeId] 
     });
 
-    map.mapTypes.set(customMapTypeId, customMapType);
-    map.setMapTypeId(customMapTypeId);
+    map.mapTypes.set(rgtvMapTypeId, rgtvMapType);
+    map.setMapTypeId(rgtvMapTypeId);
 }
 
 //Async drop marker
@@ -61,3 +62,17 @@ function dropMarkerTimeout(markerPosition, timeout, isClick) {
         }));
     }, timeout);
 }
+
+//Show cycles instead of marker
+//function showCycleTimeout(cyclePos, timeout, isClick){
+//      var newCircle = new google.maps.Circle({
+//        radius: 50,
+//        strokeColor: '#FF0000',
+//        strokeOpacity: 0.8,
+//        strokeWeight: 2,
+//        fillColor: isClick ? '#96F70D' : '#D21F1F',
+//        fillOpacity: 0.35,
+//        center: cyclePos,
+//        map: map
+//      });
+//}
