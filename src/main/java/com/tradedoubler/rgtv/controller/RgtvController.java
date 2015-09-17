@@ -39,7 +39,7 @@ public class RgtvController {
         LocationGet locationGet = ipResolveService.getLocationByIP(ip);
         RgtvMessage rgtvMessage = new RgtvMessage();
         rgtvMessage.setLat(locationGet.getLatitude());
-        rgtvMessage.setLng(locationGet.getLatitude());
+        rgtvMessage.setLng(locationGet.getLongitude());
         rgtvMessage.setType(0);
         rgtvMessage.setEvent(0);
         statisticService.addClick();
@@ -52,7 +52,7 @@ public class RgtvController {
         LocationGet locationGet = ipResolveService.getLocationByIP(ip);
         RgtvMessage rgtvMessage = new RgtvMessage();
         rgtvMessage.setLat(locationGet.getLatitude());
-        rgtvMessage.setLng(locationGet.getLatitude());
+        rgtvMessage.setLng(locationGet.getLongitude());
         rgtvMessage.setType(0);
         rgtvMessage.setEvent(1);
         statisticService.addTrackBack();

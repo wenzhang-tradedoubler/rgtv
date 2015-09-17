@@ -15,24 +15,13 @@
 <div id="timeline" style="min-width: 180px; height: 250px; margin: 0 auto"></div>
 
 <script src="js/jquery.js"></script>
-<script src="js/sockjs.js"></script>
-<script type="text/javascript">
-    var sock = new SockJS('/rgtv/messages');
-    sock.onopen = function () {
-      console.log("Opened websocket connection to rgtv server!");
-    };
-    sock.onmessage = function (e) {
-      console.log("Got data from rgtv server" + e.data);
-    };
-    sock.onclose = function () {
-      console.log("Closed websocket connection to rgtv server!");
-    };
-</script>
 <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAn6ap8ZGMHAwG-cBUFI_JEohDtFDyuC4c&callback=initMap&signed_in=true"
         async defer></script>
 <script src="js/rgtv_map.js"></script>
 <script src="js/highcharts.js"></script>
 <script src="http://code.highcharts.com/modules/exporting.js"></script>
 <script src="js/rgtv_highchart.js"></script>
+<script src="js/sockjs.js"></script>
+<script src="js/rgtv_websocket.js"></script>
 </body>
 </html>
