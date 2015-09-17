@@ -68,9 +68,9 @@ function initMap() {
 
   animateCircle(line);
 
-  for(var i=0; i< 100; i++){
+  for(var i=0; i< 10; i++){
   	//delay 100ms.
-  	dropMarkerTimeout(i*100);
+  	dropMarkerTimeout(i*500, i%2 == 0);
   }
 }
 
@@ -98,12 +98,13 @@ function dropMarker() {
 }
 
 //DROP Marker Timeout
-function dropMarkerTimeout(timeout){
+function dropMarkerTimeout(timeout, isClick){
 window.setTimeout(function() {
     markers.push(new google.maps.Marker({
       position: {lat: 59.327, lng: 18.067},
       map: map,
-      animation: google.maps.Animation.DROP
+      animation: google.maps.Animation.DROP,
+      icon: isClick ? "click.png" : "trackback.png"
     }));
   }, timeout);
 }
