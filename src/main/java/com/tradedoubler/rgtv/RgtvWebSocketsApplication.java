@@ -1,10 +1,18 @@
 package com.tradedoubler.rgtv;
 
+import org.apache.http.conn.ssl.NoopHostnameVerifier;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.embedded.EmbeddedServletContainerFactory;
 import org.springframework.boot.context.embedded.tomcat.TomcatEmbeddedServletContainerFactory;
+import org.springframework.cache.CacheManager;
+import org.springframework.cache.annotation.EnableCaching;
+import org.springframework.cache.concurrent.ConcurrentMapCacheManager;
 import org.springframework.context.annotation.Bean;
+import org.springframework.http.client.ClientHttpRequestFactory;
+import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.integration.channel.DirectChannel;
 import org.springframework.integration.dsl.IntegrationFlow;
 import org.springframework.integration.dsl.support.Function;
@@ -15,9 +23,7 @@ import org.springframework.messaging.MessageChannel;
 import org.springframework.messaging.MessageHandler;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.messaging.support.MessageBuilder;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.socket.config.annotation.EnableWebSocket;
 
 import java.util.concurrent.Executors;
@@ -29,7 +35,7 @@ import java.util.stream.Collectors;
 
 @SpringBootApplication
 @EnableWebSocket
-@RestController
+@EnableCaching
 public class RgtvWebSocketsApplication {
 
     public static void main(String args[]) throws Throwable {
@@ -40,13 +46,13 @@ public class RgtvWebSocketsApplication {
     @Bean
     public EmbeddedServletContainerFactory containerFactory() {
         int port = 9170;
-
-        return new TomcatEmbeddedServletContainerFactory(port);
+        String context = "/rgtv";
+        return new TomcatEmbeddedServletContainerFactory(context, port);
     }
 
     @Bean
     ServerWebSocketContainer serverWebSocketContainer() {
-        return new ServerWebSocketContainer("/ips").withSockJs();
+        return new ServerWebSocketContainer("/messages").withSockJs();
     }
 
     @Bean
@@ -57,6 +63,28 @@ public class RgtvWebSocketsApplication {
     @Bean(name = "webSocketFlow.input")
     MessageChannel requestChannel() {
         return new DirectChannel();
+    }
+
+    @Bean
+    public RestTemplate restTemplate() {
+        RestTemplate restTemplate = new RestTemplate(clientHttpRequestFactory());
+        return restTemplate;
+    }
+
+    @Bean
+    public CacheManager cacheManager() {
+        return new ConcurrentMapCacheManager();
+    }
+
+    private ClientHttpRequestFactory clientHttpRequestFactory() {
+        CloseableHttpClient httpClient =
+                HttpClients.custom()
+                        .setSSLHostnameVerifier(new NoopHostnameVerifier())
+                        .build();
+        HttpComponentsClientHttpRequestFactory requestFactory =
+                new HttpComponentsClientHttpRequestFactory();
+        requestFactory.setHttpClient(httpClient);
+        return requestFactory;
     }
 
     @Bean
@@ -74,11 +102,5 @@ public class RgtvWebSocketsApplication {
                     .channel(c -> c.executor(Executors.newCachedThreadPool()))
                     .handle(webSocketOutboundAdapter());
         };
-    }
-
-    @RequestMapping("/clickip/{ip}")
-    public void send(@PathVariable String ip) {
-        //https://freegeoip.net/json/8.8.8.8
-        requestChannel().send(MessageBuilder.withPayload(ip).build());
     }
 }
