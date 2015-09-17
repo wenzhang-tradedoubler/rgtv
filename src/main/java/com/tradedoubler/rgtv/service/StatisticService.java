@@ -1,6 +1,7 @@
 package com.tradedoubler.rgtv.service;
 
 import com.tradedoubler.rgtv.dto.RgtvMessage;
+import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.messaging.MessageChannel;
@@ -11,11 +12,14 @@ import org.springframework.stereotype.Service;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
+import static org.slf4j.LoggerFactory.getLogger;
+
 /**
  * Created by wen on 9/17/15.
  */
 @Service
 public class StatisticService {
+    private final Logger LOGGER = getLogger(StatisticService.class);
 
     @Autowired
     @Qualifier("webSocketFlow.input")
@@ -35,6 +39,7 @@ public class StatisticService {
 
     @Scheduled(fixedDelay = 1000)
     public void sendDataUpdates() {
+        LOGGER.info("running statistic job");
         RgtvMessage rgtvMessage = new RgtvMessage();
         rgtvMessage.setType(2);
         rgtvMessage.setClick(statistics.get(CLICK_KEY));

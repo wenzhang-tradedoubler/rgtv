@@ -23,9 +23,15 @@ import org.springframework.messaging.MessageChannel;
 import org.springframework.messaging.MessageHandler;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.messaging.support.MessageBuilder;
+import org.springframework.scheduling.TaskScheduler;
+import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.scheduling.annotation.SchedulingConfigurer;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
+import org.springframework.scheduling.config.ScheduledTaskRegistrar;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.socket.config.annotation.EnableWebSocket;
 
+import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 
@@ -36,7 +42,8 @@ import java.util.stream.Collectors;
 @SpringBootApplication
 @EnableWebSocket
 @EnableCaching
-public class RgtvWebSocketsApplication {
+@EnableScheduling
+public class RgtvWebSocketsApplication implements SchedulingConfigurer {
 
     public static void main(String args[]) throws Throwable {
         SpringApplication.run(RgtvWebSocketsApplication.class, args);
@@ -102,5 +109,15 @@ public class RgtvWebSocketsApplication {
                     .channel(c -> c.executor(Executors.newCachedThreadPool()))
                     .handle(webSocketOutboundAdapter());
         };
+    }
+
+    @Override
+    public void configureTasks(ScheduledTaskRegistrar taskRegistrar) {
+        taskRegistrar.setScheduler(taskExecutor());
+    }
+
+    @Bean(destroyMethod="shutdown")
+    public Executor taskExecutor() {
+        return Executors.newScheduledThreadPool(10);
     }
 }

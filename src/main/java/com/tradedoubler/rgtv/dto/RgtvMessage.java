@@ -28,7 +28,7 @@ public class RgtvMessage {
         this.lng = lng;
     }
 
-    public int getType() {
+    public Integer getType() {
         return type;
     }
 
