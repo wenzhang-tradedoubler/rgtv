@@ -29,7 +29,7 @@ public class RgtvController {
     @Autowired
     private StatisticService statisticService;
 
-    @RequestMapping("/clickip")
+    @RequestMapping("/click")
     public void receiveClick(@RequestParam("ip") String ip) {
         LocationGet locationGet = ipResolveService.getLocationByIP(ip);
         RgtvMessage rgtvMessage = new RgtvMessage();

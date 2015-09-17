@@ -17,11 +17,12 @@
 <script src="js/jquery.js"></script>
 <script src="js/sockjs.js"></script>
 <script type="text/javascript">
-    var sock = new SockJS('http://localhost:8081/ips');
+    var sock = new SockJS('/rgtv/messages');
     sock.onopen = function () {
       document.getElementById('time').innerHTML = 'Connecting...';
     };
     sock.onmessage = function (e) {
+      console.log(e.data);
       document.getElementById('time').innerHTML = e.data;
     };
     sock.onclose = function () {

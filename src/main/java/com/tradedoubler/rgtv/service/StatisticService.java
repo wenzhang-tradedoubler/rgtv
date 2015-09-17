@@ -27,7 +27,6 @@ public class StatisticService {
 
     private ConcurrentMap<String, Long> statistics;
 
-    @Autowired
     public StatisticService() {
         statistics = new ConcurrentHashMap<>();
         statistics.put(CLICK_KEY, 0l);
