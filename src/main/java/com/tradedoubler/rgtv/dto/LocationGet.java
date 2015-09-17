@@ -3,7 +3,7 @@ package com.tradedoubler.rgtv.dto;
 /**
  * Created by wen on 9/17/15.
  */
-public class LocationGet {
+public class LocationGet implements java.io.Serializable{
     private float latitude;
     private float longitude;
 

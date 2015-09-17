@@ -7,10 +7,12 @@ import com.tradedoubler.rgtv.service.StatisticService;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.http.HttpStatus;
 import org.springframework.messaging.MessageChannel;
 import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import static org.slf4j.LoggerFactory.getLogger;
@@ -35,8 +37,10 @@ public class RgtvController {
     private StatisticService statisticService;
 
     @RequestMapping("/click")
+    @ResponseStatus(HttpStatus.OK)
     public void receiveClick(@RequestParam("ip") String ip) {
         LocationGet locationGet = ipResolveService.getLocationByIP(ip);
+        if (locationGet == null) return;
         RgtvMessage rgtvMessage = new RgtvMessage();
         rgtvMessage.setLat(locationGet.getLatitude());
         rgtvMessage.setLng(locationGet.getLongitude());
@@ -48,8 +52,10 @@ public class RgtvController {
     }
 
     @RequestMapping("/trackback")
+    @ResponseStatus(HttpStatus.OK)
     public void receiveTrackback(@RequestParam("ip") String ip) {
         LocationGet locationGet = ipResolveService.getLocationByIP(ip);
+        if (locationGet == null) return;
         RgtvMessage rgtvMessage = new RgtvMessage();
         rgtvMessage.setLat(locationGet.getLatitude());
         rgtvMessage.setLng(locationGet.getLongitude());
