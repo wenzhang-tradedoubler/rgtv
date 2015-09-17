@@ -41,7 +41,7 @@ public class StatisticService {
     public void sendDataUpdates() {
         LOGGER.info("running statistic job");
         RgtvMessage rgtvMessage = new RgtvMessage();
-        rgtvMessage.setType(2);
+        rgtvMessage.setType(1);
         rgtvMessage.setClick(statistics.get(CLICK_KEY));
         rgtvMessage.setTrackback(statistics.get(TRACK_BACK_KEY));
         messageChannel.send(MessageBuilder.withPayload(rgtvMessage).build());
@@ -54,7 +54,7 @@ public class StatisticService {
 
     public void addTrackBack() {
         Long trackbacks = statistics.get(TRACK_BACK_KEY);
-        statistics.put(TRACK_BACK_KEY, trackbacks);
+        statistics.put(TRACK_BACK_KEY, trackbacks + 1);
     }
 
 }

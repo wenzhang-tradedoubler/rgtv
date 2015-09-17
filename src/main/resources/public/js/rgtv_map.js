@@ -48,14 +48,6 @@ function initMap() {
   
   map.mapTypes.set(customMapTypeId, customMapType);
   map.setMapTypeId(customMapTypeId);
-
-  //Drop markers...
-  for(var i=0; i< 10; i++){
-  	//delay 100ms.
-  	var r = Math.random() * 10;
-  	var position = new google.maps.LatLng(59.341112+r,18.064447+r);
-  	dropMarkerTimeout(position, i*500, i%2 == 0);
-  }
 }
 
 //Async drop marker

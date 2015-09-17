@@ -6,9 +6,17 @@ sock.onopen = function () {
 };
 
 sock.onmessage = function (e) {
-    console.log("Got data from rgtv server" + e.data);
-    var position = new google.maps.LatLng(JSON.parse(e.data).lat, JSON.parse(e.data).lng);
-    dropMarkerTimeout(position, 200, true);
+    var data = JSON.parse(e.data);
+    console.log("Got data from rgtv server" + data);
+    var type = data.type;
+    if(type == 0){
+        //Handle clicks/trackbacks
+        var position = new google.maps.LatLng(data.lat, data.lng);
+        var eventType = data.event;
+        dropMarkerTimeout(position, 200, eventType == 0);
+    }else {
+        console.log("TODO: handle statistics");
+    }
 };
 
 sock.onclose = function () {
