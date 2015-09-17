@@ -38,7 +38,8 @@ function initMap() {
       name: 'Custom Style'
   });
   var customMapTypeId = 'custom_style';
-  
+
+  //Create map and set center to Tradedoubler.
   map = new google.maps.Map(document.getElementById('map'), {
     center: {lat: 59.341112, lng: 18.064447},
     zoom: 3,
@@ -48,60 +49,20 @@ function initMap() {
   map.mapTypes.set(customMapTypeId, customMapType);
   map.setMapTypeId(customMapTypeId);
 
-  // Define the symbol, using one of the predefined paths ('CIRCLE')
-  // supplied by the Google Maps JavaScript API.
-  var lineSymbol = {
-    path: google.maps.SymbolPath.CIRCLE,
-    scale: 8,
-    strokeColor: '#393'
-  };
-
-  // Create the polyline and add the symbol to it via the 'icons' property.
-  var line = new google.maps.Polyline({
-    path: [{lat: 22.291, lng: 153.027}, {lat: 18.291, lng: 153.027}],
-    icons: [{
-      icon: lineSymbol,
-      offset: '100%'
-    }],
-    map: map
-  });
-
-  animateCircle(line);
-
+  //Drop markers...
   for(var i=0; i< 10; i++){
   	//delay 100ms.
-  	dropMarkerTimeout(i*500, i%2 == 0);
+  	var r = Math.random() * 10;
+  	var position = new google.maps.LatLng(59.341112+r,18.064447+r);
+  	dropMarkerTimeout(position, i*500, i%2 == 0);
   }
 }
 
-// Use the DOM setInterval() function to change the offset of the symbol
-// at fixed intervals.
-function animateCircle(line) {
-    var count = 0;
-    window.setInterval(function() {
-      count = (count + 1) % 200;
-
-      var icons = line.get('icons');
-      icons[0].offset = (count / 2) + '%';
-      line.set('icons', icons);
-  }, 20);
-}
-
-//DROP Marker	
-function dropMarker() {
-  marker = new google.maps.Marker({
-    map: map,
-    draggable: false,
-    animation: google.maps.Animation.DROP,
-    position: {lat: 59.327, lng: 18.067}
-  });
-}
-
-//DROP Marker Timeout
-function dropMarkerTimeout(timeout, isClick){
+//Async drop marker
+function dropMarkerTimeout(markerPosition, timeout, isClick){
 window.setTimeout(function() {
     markers.push(new google.maps.Marker({
-      position: {lat: 59.327, lng: 18.067},
+      position: markerPosition,
       map: map,
       animation: google.maps.Animation.DROP,
       icon: isClick ? "images/click.png" : "images/trackback.png"
