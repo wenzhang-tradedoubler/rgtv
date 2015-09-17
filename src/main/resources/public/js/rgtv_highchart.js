@@ -1,4 +1,6 @@
-var hc;
+var hc_chart;
+var hc_clicks;
+var hc_trackbacks;
 
 $(function () {
     $(document).ready(function () {
@@ -8,20 +10,24 @@ $(function () {
             }
         });
 
-        hc = $('#timeline').highcharts({
+        hc_chart = $('#timeline').highcharts({
             chart: {
                 type: 'spline',
                 animation: Highcharts.svg, // don't animate in old IE
                 marginRight: 10,
                 events: {
                     load: function () {
-
-                        // set up the updating of the chart each second
-                        var series = this.series[0];
+                        var series0 = this.series[0];
                         setInterval(function () {
                             var x = (new Date()).getTime(), // current time
-                                y = Math.random();
-                            series.addPoint([x, y], true, true);
+                                y = hc_clicks;
+                            series0.addPoint([x, y], true, true);
+                        }, 1000);
+                        var series1 = this.series[1];
+                        setInterval(function () {
+                            var x = (new Date()).getTime(), // current time
+                                y = hc_trackbacks;
+                            series1.addPoint([x, y], true, true);
                         }, 1000);
                     }
                 }
@@ -35,7 +41,7 @@ $(function () {
             },
             yAxis: {
                 title: {
-                    text: 'Numbers'
+                    text: 'Click vs Trackback'
                 },
                 plotLines: [{
                     value: 0,
@@ -45,9 +51,7 @@ $(function () {
             },
             tooltip: {
                 formatter: function () {
-                    return '<b>' + this.series.name + '</b><br/>' +
-                        Highcharts.dateFormat('%Y-%m-%d %H:%M:%S', this.x) + '<br/>' +
-                        Highcharts.numberFormat(this.y, 2);
+                    return '<b>' + this.series.name + '</b><br/>' + Highcharts.dateFormat('%Y-%m-%d %H:%M:%S', this.x) + '<br/>' + Highcharts.numberFormat(this.y, 2);
                 }
             },
             legend: {
@@ -57,17 +61,33 @@ $(function () {
                 enabled: false
             },
             series: [{
-                name: 'Random data',
+                name: 'Click',
+                color: '#96F70D',
                 data: (function () {
                     // generate an array of random data
                     var data = [],
                         time = (new Date()).getTime(),
                         i;
-
-                    for (i = -19; i <= 0; i += 1) {
+                    for (i = 0; i < 20; i++) {
                         data.push({
-                            x: time + i * 1000,
-                            y: Math.random()
+                            x: time + (i - 19) * 1000,
+                            y: 0
+                        });
+                    }
+                    return data;
+                }())
+            }, {
+                name: 'Trackback',
+                color: '#D21F1F',
+                data: (function () {
+                    // generate an array of random data
+                    var data = [],
+                        time = (new Date()).getTime(),
+                        i;
+                    for (i = 0; i < 20; i++) {
+                        data.push({
+                            x: time + (i - 19) * 1000,
+                            y: 0
                         });
                     }
                     return data;
@@ -76,3 +96,8 @@ $(function () {
         });
     });
 });
+
+function eventStatistics(numClicks, numTrackbacks) {
+    hc_clicks = numClicks;
+    hc_trackbacks = numTrackbacks;
+}

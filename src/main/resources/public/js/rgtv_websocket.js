@@ -1,4 +1,3 @@
-
 var sock = new SockJS('/rgtv/messages');
 
 sock.onopen = function () {
@@ -15,7 +14,10 @@ sock.onmessage = function (e) {
         var eventType = data.event;
         dropMarkerTimeout(position, 200, eventType == 0);
     }else {
-        console.log("TODO: handle statistics");
+        //Handle statistics
+        var numClicks = data.click;
+        var numTrackbacks = data.trackback;
+        eventStatistics(numClicks, numTrackbacks);
     }
 };
 
