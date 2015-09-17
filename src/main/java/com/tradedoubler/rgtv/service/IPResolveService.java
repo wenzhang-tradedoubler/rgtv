@@ -3,7 +3,6 @@ package com.tradedoubler.rgtv.service;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.tradedoubler.rgtv.dto.LocationGet;
-import org.apache.log4j.spi.LoggerFactory;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
@@ -34,10 +33,10 @@ public class IPResolveService {
             String response = restTemplate.getForObject(url, String.class);
             Gson gson = new GsonBuilder().create();
             LocationGet locationGet = gson.fromJson(response, LocationGet.class);
-            LOGGER.info("request");
+            LOGGER.info("Resolve location for IP "+ ip);
             return locationGet;
         } catch (HttpClientErrorException ex) {
-
+            ex.printStackTrace();
         }
         return null;
     }

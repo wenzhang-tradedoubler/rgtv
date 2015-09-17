@@ -19,21 +19,20 @@
 <script type="text/javascript">
     var sock = new SockJS('/rgtv/messages');
     sock.onopen = function () {
-      document.getElementById('time').innerHTML = 'Connecting...';
+      console.log("Opened websocket connection to rgtv server!");
     };
     sock.onmessage = function (e) {
-      console.log(e.data);
-      document.getElementById('time').innerHTML = e.data;
+      console.log("Got data from rgtv server" + e.data);
     };
     sock.onclose = function () {
-      document.getElementById('time').innerHTML = "Server closed connection or hasn't been started";
+      console.log("Closed websocket connection to rgtv server!");
     };
 </script>
 <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAn6ap8ZGMHAwG-cBUFI_JEohDtFDyuC4c&callback=initMap&signed_in=true"
         async defer></script>
 <script src="js/rgtv_map.js"></script>
 <script src="js/highcharts.js"></script>
-<script src="js/http://code.highcharts.com/modules/exporting.js"></script>
+<script src="http://code.highcharts.com/modules/exporting.js"></script>
 <script src="js/rgtv_highchart.js"></script>
 </body>
 </html>
