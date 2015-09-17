@@ -39,7 +39,7 @@ public class RgtvWebSocketsApplication {
     @SuppressWarnings("UnusedDeclaration")
     @Bean
     public EmbeddedServletContainerFactory containerFactory() {
-        int port = 8081;
+        int port = 9170;
 
         return new TomcatEmbeddedServletContainerFactory(port);
     }
