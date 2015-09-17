@@ -46,7 +46,7 @@ public class RgtvWebSocketsApplication {
 
     @Bean
     ServerWebSocketContainer serverWebSocketContainer() {
-        return new ServerWebSocketContainer("/ ").withSockJs();
+        return new ServerWebSocketContainer("/ips").withSockJs();
     }
 
     @Bean
@@ -78,6 +78,7 @@ public class RgtvWebSocketsApplication {
 
     @RequestMapping("/clickip/{ip}")
     public void send(@PathVariable String ip) {
+        //https://freegeoip.net/json/8.8.8.8
         requestChannel().send(MessageBuilder.withPayload(ip).build());
     }
 }
