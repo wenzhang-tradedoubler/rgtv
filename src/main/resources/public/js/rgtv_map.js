@@ -104,7 +104,7 @@ window.setTimeout(function() {
       position: {lat: 59.327, lng: 18.067},
       map: map,
       animation: google.maps.Animation.DROP,
-      icon: isClick ? "click.png" : "trackback.png"
+      icon: isClick ? "images/click.png" : "images/trackback.png"
     }));
   }, timeout);
 }

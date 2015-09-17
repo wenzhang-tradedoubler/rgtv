@@ -1,27 +1,21 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Tradedoubler-RGTV</title>
-  <link rel="stylesheet" href="main.css">
+    <title>Tradedoubler-RGTV</title>
+    <link rel="stylesheet" href="css/main.css">
 </head>
 
 <body style="margin: 0">
 <noscript>
     <h2 style="color: #ff0000">Seems your browser doesn't support Javascript!
-    WebSocket relies on Javascript being enabled. Please enable Javascript and reload this page!
+        WebSocket relies on Javascript being enabled. Please enable Javascript and reload this page!
     </h2>
 </noscript>
-<!--<div id="time"-->
-     <!--style="position: absolute;-->
-        <!--bottom: 0;-->
-        <!--font-size: 800%;-->
-        <!--height: 200px;-->
-        <!--margin: auto;-->
-        <!--text-align: center;-->
-        <!--top: 0;-->
-        <!--width: 100%;">Starting...</div>-->
 <div id="map"></div>
-<script src="sockjs.js"></script>
+<div id="timeline" style="min-width: 180px; height: 250px; margin: 0 auto"></div>
+
+<script src="js/jquery.js"></script>
+<script src="js/sockjs.js"></script>
 <script type="text/javascript">
     var sock = new SockJS('http://localhost:8081/ips');
     sock.onopen = function () {
@@ -34,8 +28,11 @@
       document.getElementById('time').innerHTML = "Server closed connection or hasn't been started";
     };
 </script>
-<script src="map.js"></script>
-<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAn6ap8ZGMHAwG-cBUFI_JEohDtFDyuC4c&callback=initMap&signed_in=true" async defer>
-</script>
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAn6ap8ZGMHAwG-cBUFI_JEohDtFDyuC4c&callback=initMap&signed_in=true"
+        async defer></script>
+<script src="js/rgtv_map.js"></script>
+<script src="js/highcharts.js"></script>
+<script src="js/http://code.highcharts.com/modules/exporting.js"></script>
+<script src="js/rgtv_highchart.js"></script>
 </body>
 </html>

@@ -5,5 +5,9 @@ html, body {
 }
 
 #map {
-   height: 100%;
+   height: 75%;
+}
+
+#timeline {
+   height: 25%;
 }
