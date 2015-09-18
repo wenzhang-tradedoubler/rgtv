@@ -15,6 +15,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Random;
+
 import static org.slf4j.LoggerFactory.getLogger;
 
 /**
@@ -36,14 +38,16 @@ public class RgtvController {
     @Autowired
     private StatisticService statisticService;
 
+    private final Random r = new Random();
+
     @RequestMapping("/click")
     @ResponseStatus(HttpStatus.OK)
     public void receiveClick(@RequestParam("ip") String ip) {
         LocationGet locationGet = ipResolveService.getLocationByIP(ip);
         if (locationGet == null) return;
         RgtvMessage rgtvMessage = new RgtvMessage();
-        rgtvMessage.setLat(locationGet.getLatitude());
-        rgtvMessage.setLng(locationGet.getLongitude());
+        rgtvMessage.setLat(locationGet.getLatitude() + r.nextFloat());
+        rgtvMessage.setLng(locationGet.getLongitude()+ r.nextFloat());
         rgtvMessage.setType(0);
         rgtvMessage.setEvent(0);
         statisticService.addClick();
@@ -57,8 +61,8 @@ public class RgtvController {
         LocationGet locationGet = ipResolveService.getLocationByIP(ip);
         if (locationGet == null) return;
         RgtvMessage rgtvMessage = new RgtvMessage();
-        rgtvMessage.setLat(locationGet.getLatitude());
-        rgtvMessage.setLng(locationGet.getLongitude());
+        rgtvMessage.setLat(locationGet.getLatitude()+ r.nextFloat());
+        rgtvMessage.setLng(locationGet.getLongitude()+ r.nextFloat());
         rgtvMessage.setType(0);
         rgtvMessage.setEvent(1);
         statisticService.addTrackBack();

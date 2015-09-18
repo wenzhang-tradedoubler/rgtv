@@ -10,8 +10,6 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.atomic.AtomicLong;
 
 import static org.slf4j.LoggerFactory.getLogger;
@@ -37,18 +35,15 @@ public class StatisticService {
     @Scheduled(fixedDelay = 1000)
     public void sendDataUpdates() {
         LOGGER.info("running statistic job");
-        RgtvMessage rgtvMessage = new RgtvMessage();
-        rgtvMessage.setType(1);
-        rgtvMessage.setClick(numClicks.longValue());
-        rgtvMessage.setTrackback(numTrackbacks.longValue());
-        messageChannel.send(MessageBuilder.withPayload(rgtvMessage).build());
-    }
-
-    @Scheduled(fixedDelay = 5000)
-    public void resetCounter() {
-        LOGGER.info("resetting counters.");
+        long clickInOneSecond = numClicks.longValue();
+        long trackbackInOneSecond = numTrackbacks.longValue();
         numClicks.getAndSet(0l);
         numTrackbacks.getAndSet(0l);
+        RgtvMessage rgtvMessage = new RgtvMessage();
+        rgtvMessage.setType(1);
+        rgtvMessage.setClick(clickInOneSecond);
+        rgtvMessage.setTrackback(trackbackInOneSecond);
+        messageChannel.send(MessageBuilder.withPayload(rgtvMessage).build());
     }
 
     public void addClick() {
