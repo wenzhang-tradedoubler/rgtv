@@ -27,17 +27,11 @@ public class StatisticService {
     @Qualifier("webSocketFlow.input")
     private MessageChannel messageChannel;
 
-
-    private final static String CLICK_KEY = "clicks";
-    private final static String TRACK_BACK_KEY = "trackbacks";
-
-    private ConcurrentMap<String, AtomicLong> statistics;
+    private final AtomicLong numClicks = new AtomicLong();
+    private final AtomicLong numTrackbacks = new AtomicLong();
 
     @PostConstruct
     public void initCounter() {
-        statistics = new ConcurrentHashMap<>();
-        statistics.put(CLICK_KEY, new AtomicLong(0l));
-        statistics.put(TRACK_BACK_KEY, new AtomicLong(0l));
     }
 
     @Scheduled(fixedDelay = 1000)
@@ -45,28 +39,23 @@ public class StatisticService {
         LOGGER.info("running statistic job");
         RgtvMessage rgtvMessage = new RgtvMessage();
         rgtvMessage.setType(1);
-        rgtvMessage.setClick(statistics.get(CLICK_KEY).longValue());
-        rgtvMessage.setTrackback(statistics.get(TRACK_BACK_KEY).longValue());
+        rgtvMessage.setClick(numClicks.longValue());
+        rgtvMessage.setTrackback(numTrackbacks.longValue());
         messageChannel.send(MessageBuilder.withPayload(rgtvMessage).build());
     }
 
     @Scheduled(fixedDelay = 60000)
     public void resetCounter() {
         LOGGER.info("resetting counters.");
-        AtomicLong clicks = statistics.get(CLICK_KEY);
-        clicks.getAndSet(0l);
-        AtomicLong trackbacks = statistics.get(TRACK_BACK_KEY);
-        trackbacks.getAndSet(0l);
+        numClicks.getAndSet(0l);
+        numTrackbacks.getAndSet(0l);
     }
 
     public void addClick() {
-        AtomicLong clicks = statistics.get(CLICK_KEY);
-        clicks.incrementAndGet();
+        numClicks.incrementAndGet();
     }
 
     public void addTrackBack() {
-        AtomicLong trackbacks = statistics.get(TRACK_BACK_KEY);
-        trackbacks.incrementAndGet();
+        numTrackbacks.incrementAndGet();
     }
-
 }
