@@ -44,7 +44,7 @@ public class StatisticService {
         messageChannel.send(MessageBuilder.withPayload(rgtvMessage).build());
     }
 
-    @Scheduled(fixedDelay = 60000)
+    @Scheduled(fixedDelay = 5000)
     public void resetCounter() {
         LOGGER.info("resetting counters.");
         numClicks.getAndSet(0l);
