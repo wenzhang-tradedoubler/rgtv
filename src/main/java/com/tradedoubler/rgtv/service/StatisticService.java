@@ -9,8 +9,10 @@ import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.PostConstruct;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.atomic.AtomicLong;
 
 import static org.slf4j.LoggerFactory.getLogger;
 
@@ -29,12 +31,13 @@ public class StatisticService {
     private final static String CLICK_KEY = "clicks";
     private final static String TRACK_BACK_KEY = "trackbacks";
 
-    private ConcurrentMap<String, Long> statistics;
+    private ConcurrentMap<String, AtomicLong> statistics;
 
-    public StatisticService() {
+    @PostConstruct
+    public void initCounter() {
         statistics = new ConcurrentHashMap<>();
-        statistics.put(CLICK_KEY, 0l);
-        statistics.put("trackbacks", 0l);
+        statistics.put(CLICK_KEY, new AtomicLong(0l));
+        statistics.put(TRACK_BACK_KEY, new AtomicLong(0l));
     }
 
     @Scheduled(fixedDelay = 1000)
@@ -42,19 +45,28 @@ public class StatisticService {
         LOGGER.info("running statistic job");
         RgtvMessage rgtvMessage = new RgtvMessage();
         rgtvMessage.setType(1);
-        rgtvMessage.setClick(statistics.get(CLICK_KEY));
-        rgtvMessage.setTrackback(statistics.get(TRACK_BACK_KEY));
+        rgtvMessage.setClick(statistics.get(CLICK_KEY).longValue());
+        rgtvMessage.setTrackback(statistics.get(TRACK_BACK_KEY).longValue());
         messageChannel.send(MessageBuilder.withPayload(rgtvMessage).build());
     }
 
+    @Scheduled(fixedDelay = 60000)
+    public void resetCounter() {
+        LOGGER.info("resetting counters.");
+        AtomicLong clicks = statistics.get(CLICK_KEY);
+        clicks.getAndSet(0l);
+        AtomicLong trackbacks = statistics.get(TRACK_BACK_KEY);
+        trackbacks.getAndSet(0l);
+    }
+
     public void addClick() {
-        Long clicks = statistics.get(CLICK_KEY);
-        statistics.put(CLICK_KEY, clicks + 1);
+        AtomicLong clicks = statistics.get(CLICK_KEY);
+        clicks.incrementAndGet();
     }
 
     public void addTrackBack() {
-        Long trackbacks = statistics.get(TRACK_BACK_KEY);
-        statistics.put(TRACK_BACK_KEY, trackbacks + 1);
+        AtomicLong trackbacks = statistics.get(TRACK_BACK_KEY);
+        trackbacks.incrementAndGet();
     }
 
 }
