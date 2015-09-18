@@ -14,6 +14,9 @@ import org.springframework.web.client.RestTemplate;
 
 import javax.annotation.PostConstruct;
 
+import java.util.Properties;
+import java.util.Set;
+
 import static org.slf4j.LoggerFactory.getLogger;
 
 /**
@@ -35,24 +38,24 @@ public class IPResolveService {
     @PostConstruct
     public void preLoadCache() {
         Cache cache = cacheManager.getCache("ipLocationCache");
-//        Properties properties = new Properties();
-//        try {
-//            properties.load(new FileInputStream("ip.properties"));
-//            Set<String> names = properties.stringPropertyNames();
-//            for(String name : names){
-//                String[] location = String.valueOf(properties.get(name)).split(",");
-//                if(location == null || location.length == 0){
-//                  throw new Exception("Can not parse ip location for "+name);
-//                }
-//                LocationGet loc = new LocationGet();
-//                loc.setLatitude(Float.parseFloat(location[0]));
-//                loc.setLongitude(Float.parseFloat(location[1]));
-//                cache.put(name, loc);
-//            }
-//        } catch (Exception e) {
-//            LOGGER.error("Can not pre-load ip properties "+ e);
-//            e.printStackTrace();
-//        }
+        Properties properties = new Properties();
+        try {
+            properties.load(this.getClass().getClassLoader().getResourceAsStream("./ip.properties"));
+            Set<String> names = properties.stringPropertyNames();
+            for(String name : names){
+                String[] location = String.valueOf(properties.get(name)).split(",");
+                if(location == null || location.length == 0){
+                  throw new Exception("Can not parse ip location for "+name);
+                }
+                LocationGet loc = new LocationGet();
+                loc.setLatitude(Float.parseFloat(location[0]));
+                loc.setLongitude(Float.parseFloat(location[1]));
+                cache.put(name, loc);
+            }
+        } catch (Exception e) {
+            LOGGER.error("Can not pre-load ip properties "+ e);
+            e.printStackTrace();
+        }
     }
 
     @Cacheable(value="ipLocationCache", key="#ip")
