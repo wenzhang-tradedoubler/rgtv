@@ -1,26 +1,40 @@
-var sock = new SockJS('/rgtv/messages');
+var sockGeoLocation = new SockJS('/rgtv/stomp');
+var sockNumberStatistics = new SockJS('/rgtv/stomp');
 
-sock.onopen = function () {
+sockGeoLocation.onopen = function () {
+    console.log("Opened websocket connection to rgtv server!");
+};
+sockNumberStatistics.onopen = function () {
     console.log("Opened websocket connection to rgtv server!");
 };
 
-sock.onmessage = function (e) {
-    var data = JSON.parse(e.data);
-    console.log("Got data from rgtv server" + data);
-    var type = data.type;
-    if(type == 0){
-        //Handle clicks/trackbacks
+var stompGeoLocationClient = Stomp.over(sockGeoLocation);
+
+stompGeoLocationClient.connect({ }, function(frame) {
+    // subscribe to the /topic/geolocation endpoint
+    stompGeoLocationClient.subscribe("/topic/geolocation", function(data) {
+        var data = JSON.parse(data.body);
         var position = new google.maps.LatLng(data.lat, data.lng);
         var eventType = data.event;
         dropMarkerTimeout(position, 200, eventType == 0);
-    }else {
-        //Handle statistics
+    });
+});
+
+var stompNumberStatisticsClient = Stomp.over(sockNumberStatistics);
+stompNumberStatisticsClient.connect({ }, function(frame) {
+    // subscribe to the /topic/numberstatistics endpoint
+    stompNumberStatisticsClient.subscribe("/topic/numberstatistics", function(data) {
+        var data = JSON.parse(data.body);
         var numClicks = data.click;
         var numTrackbacks = data.trackback;
         updateStatistics(numClicks, numTrackbacks);
-    }
-};
+    });
+});
 
-sock.onclose = function () {
+
+sockGeoLocation.onclose = function () {
+    console.log("Closed websocket connection to rgtv server!");
+};
+sockNumberStatistics.onclose = function () {
     console.log("Closed websocket connection to rgtv server!");
 };

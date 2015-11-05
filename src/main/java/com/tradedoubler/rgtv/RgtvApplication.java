@@ -9,45 +9,38 @@ import org.springframework.boot.context.embedded.EmbeddedServletContainerFactory
 import org.springframework.boot.context.embedded.tomcat.TomcatEmbeddedServletContainerFactory;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.EnableCaching;
-import org.springframework.cache.concurrent.ConcurrentMapCacheManager;
 import org.springframework.cache.ehcache.EhCacheCacheManager;
 import org.springframework.context.annotation.Bean;
 import org.springframework.http.client.ClientHttpRequestFactory;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
-import org.springframework.integration.channel.DirectChannel;
-import org.springframework.integration.dsl.IntegrationFlow;
-import org.springframework.integration.dsl.support.Function;
-import org.springframework.integration.websocket.ServerWebSocketContainer;
-import org.springframework.integration.websocket.outbound.WebSocketOutboundMessageHandler;
-import org.springframework.messaging.Message;
-import org.springframework.messaging.MessageChannel;
-import org.springframework.messaging.MessageHandler;
-import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
-import org.springframework.messaging.support.MessageBuilder;
-import org.springframework.scheduling.TaskScheduler;
+import org.springframework.messaging.simp.config.MessageBrokerRegistry;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.SchedulingConfigurer;
-import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import org.springframework.scheduling.config.ScheduledTaskRegistrar;
 import org.springframework.web.client.RestTemplate;
-import org.springframework.web.socket.config.annotation.EnableWebSocket;
+import org.springframework.web.socket.config.annotation.AbstractWebSocketMessageBrokerConfigurer;
+import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker;
+import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
 
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
-import java.util.stream.Collectors;
 
 /**
- * Created by wen on 9/16/15.
+ * Created by wen on 9/18/15.
  */
-
 @SpringBootApplication
-@EnableWebSocket
+@EnableWebSocketMessageBroker
 @EnableCaching
 @EnableScheduling
-public class RgtvWebSocketsApplication implements SchedulingConfigurer {
+public class RgtvApplication extends AbstractWebSocketMessageBrokerConfigurer implements SchedulingConfigurer {
 
     public static void main(String args[]) throws Throwable {
-        SpringApplication.run(RgtvWebSocketsApplication.class, args);
+        SpringApplication.run(RgtvApplication.class, args);
+    }
+
+    @Override
+    public void registerStompEndpoints(StompEndpointRegistry registry) {
+        registry.addEndpoint("/stomp").withSockJS();
     }
 
     @SuppressWarnings("UnusedDeclaration")
@@ -58,19 +51,10 @@ public class RgtvWebSocketsApplication implements SchedulingConfigurer {
         return new TomcatEmbeddedServletContainerFactory(context, port);
     }
 
-    @Bean
-    ServerWebSocketContainer serverWebSocketContainer() {
-        return new ServerWebSocketContainer("/messages").withSockJs();
-    }
-
-    @Bean
-    MessageHandler webSocketOutboundAdapter() {
-        return new WebSocketOutboundMessageHandler(serverWebSocketContainer());
-    }
-
-    @Bean(name = "webSocketFlow.input")
-    MessageChannel requestChannel() {
-        return new DirectChannel();
+    @Override
+    public void configureMessageBroker(MessageBrokerRegistry config) {
+        // use the /topic prefix for outgoing WebSocket communication
+        config.enableSimpleBroker("/topic");
     }
 
     @Bean
@@ -84,6 +68,11 @@ public class RgtvWebSocketsApplication implements SchedulingConfigurer {
         return new EhCacheCacheManager();
     }
 
+    @Bean(destroyMethod = "shutdown")
+    public Executor taskExecutor() {
+        return Executors.newScheduledThreadPool(200);
+    }
+
     private ClientHttpRequestFactory clientHttpRequestFactory() {
         CloseableHttpClient httpClient =
                 HttpClients.custom()
@@ -95,30 +84,8 @@ public class RgtvWebSocketsApplication implements SchedulingConfigurer {
         return requestFactory;
     }
 
-    @Bean
-    IntegrationFlow webSocketFlow() {
-        return f -> {
-            Function<Message, Object> splitter = m -> serverWebSocketContainer()
-                    .getSessions()
-                    .keySet()
-                    .stream()
-                    .map(s -> MessageBuilder.fromMessage(m)
-                            .setHeader(SimpMessageHeaderAccessor.SESSION_ID_HEADER, s)
-                            .build())
-                    .collect(Collectors.toList());
-            f.split(Message.class, splitter)
-                    .channel(c -> c.executor(Executors.newCachedThreadPool()))
-                    .handle(webSocketOutboundAdapter());
-        };
-    }
-
     @Override
     public void configureTasks(ScheduledTaskRegistrar taskRegistrar) {
         taskRegistrar.setScheduler(taskExecutor());
-    }
-
-    @Bean(destroyMethod="shutdown")
-    public Executor taskExecutor() {
-        return Executors.newScheduledThreadPool(200);
     }
 }

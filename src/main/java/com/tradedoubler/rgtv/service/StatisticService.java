@@ -1,11 +1,10 @@
 package com.tradedoubler.rgtv.service;
 
-import com.tradedoubler.rgtv.dto.RgtvMessage;
+import com.tradedoubler.rgtv.EnumEndPoint;
+import com.tradedoubler.rgtv.dto.NumberStatisticsDTO;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.messaging.MessageChannel;
-import org.springframework.messaging.support.MessageBuilder;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
@@ -22,8 +21,7 @@ public class StatisticService {
     private final Logger LOGGER = getLogger(StatisticService.class);
 
     @Autowired
-    @Qualifier("webSocketFlow.input")
-    private MessageChannel messageChannel;
+    private SimpMessagingTemplate template;
 
     private final AtomicLong numClicks = new AtomicLong();
     private final AtomicLong numTrackbacks = new AtomicLong();
@@ -39,11 +37,10 @@ public class StatisticService {
         long trackbackInOneSecond = numTrackbacks.longValue();
         numClicks.getAndSet(0l);
         numTrackbacks.getAndSet(0l);
-        RgtvMessage rgtvMessage = new RgtvMessage();
-        rgtvMessage.setType(1);
-        rgtvMessage.setClick(clickInOneSecond);
-        rgtvMessage.setTrackback(trackbackInOneSecond);
-        messageChannel.send(MessageBuilder.withPayload(rgtvMessage).build());
+        NumberStatisticsDTO numberStatisticsDTO = new NumberStatisticsDTO();
+        numberStatisticsDTO.setClick(clickInOneSecond);
+        numberStatisticsDTO.setTrackback(trackbackInOneSecond);
+        template.convertAndSend(EnumEndPoint.NUMBER_STATISTICS_ENDPOINT.getPath(), numberStatisticsDTO);
     }
 
     public void addClick() {

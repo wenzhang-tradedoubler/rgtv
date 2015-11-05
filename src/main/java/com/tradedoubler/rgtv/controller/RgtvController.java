@@ -1,15 +1,14 @@
 package com.tradedoubler.rgtv.controller;
 
+import com.tradedoubler.rgtv.EnumEndPoint;
+import com.tradedoubler.rgtv.dto.GeoLocationDTO;
 import com.tradedoubler.rgtv.dto.LocationGet;
-import com.tradedoubler.rgtv.dto.RgtvMessage;
 import com.tradedoubler.rgtv.service.IPResolveService;
 import com.tradedoubler.rgtv.service.StatisticService;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
-import org.springframework.messaging.MessageChannel;
-import org.springframework.messaging.support.MessageBuilder;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -29,14 +28,13 @@ public class RgtvController {
     private final Logger LOGGER = getLogger(RgtvController.class);
 
     @Autowired
-    @Qualifier("webSocketFlow.input")
-    private MessageChannel messageChannel;
-
-    @Autowired
     private IPResolveService ipResolveService;
 
     @Autowired
     private StatisticService statisticService;
+
+    @Autowired
+    private SimpMessagingTemplate template;
 
     private final Random r = new Random();
 
@@ -45,14 +43,13 @@ public class RgtvController {
     public void receiveClick(@RequestParam("ip") String ip) {
         LocationGet locationGet = ipResolveService.getLocationByIP(ip);
         if (locationGet == null) return;
-        RgtvMessage rgtvMessage = new RgtvMessage();
-        rgtvMessage.setLat(locationGet.getLatitude() + r.nextFloat());
-        rgtvMessage.setLng(locationGet.getLongitude()+ r.nextFloat());
-        rgtvMessage.setType(0);
-        rgtvMessage.setEvent(0);
+        GeoLocationDTO geoLocationDTO = new GeoLocationDTO();
+        geoLocationDTO.setLat(locationGet.getLatitude() + r.nextFloat());
+        geoLocationDTO.setLng(locationGet.getLongitude() + r.nextFloat());
+        geoLocationDTO.setEvent(0);
         statisticService.addClick();
-        boolean sent = messageChannel.send(MessageBuilder.withPayload(rgtvMessage).build());
-        LOGGER.info("Send click to client "+ (sent ? "succeed" : "failed")+" lat="+rgtvMessage.getLat()+" lng="+rgtvMessage.getLng());
+        template.convertAndSend(EnumEndPoint.GEO_LOCATION_ENDPOINT.getPath(), geoLocationDTO);
+        LOGGER.info("Send click to client succeed" + " lat=" + geoLocationDTO.getLat() + " lng=" + geoLocationDTO.getLng());
     }
 
     @RequestMapping("/trackback")
@@ -60,13 +57,12 @@ public class RgtvController {
     public void receiveTrackback(@RequestParam("ip") String ip) {
         LocationGet locationGet = ipResolveService.getLocationByIP(ip);
         if (locationGet == null) return;
-        RgtvMessage rgtvMessage = new RgtvMessage();
-        rgtvMessage.setLat(locationGet.getLatitude()+ r.nextFloat());
-        rgtvMessage.setLng(locationGet.getLongitude()+ r.nextFloat());
-        rgtvMessage.setType(0);
-        rgtvMessage.setEvent(1);
+        GeoLocationDTO geoLocationDTO = new GeoLocationDTO();
+        geoLocationDTO.setLat(locationGet.getLatitude() + r.nextFloat());
+        geoLocationDTO.setLng(locationGet.getLongitude() + r.nextFloat());
+        geoLocationDTO.setEvent(1);
         statisticService.addTrackBack();
-        boolean sent = messageChannel.send(MessageBuilder.withPayload(rgtvMessage).build());
-        LOGGER.info("Send trackback to client " + (sent ? "succeed" : "failed") + " lat=" + rgtvMessage.getLat() + " lng=" + rgtvMessage.getLng());
+        template.convertAndSend(EnumEndPoint.GEO_LOCATION_ENDPOINT.getPath(), geoLocationDTO);
+        LOGGER.info("Send trackback to client succeed" + " lat=" + geoLocationDTO.getLat() + " lng=" + geoLocationDTO.getLng());
     }
 }
