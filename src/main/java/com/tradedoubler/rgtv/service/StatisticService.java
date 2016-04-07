@@ -25,6 +25,7 @@ public class StatisticService {
 
     private final AtomicLong numClicks = new AtomicLong();
     private final AtomicLong numTrackbacks = new AtomicLong();
+    private final AtomicLong numCDTDevices = new AtomicLong();
 
     @PostConstruct
     public void initCounter() {
@@ -40,6 +41,7 @@ public class StatisticService {
         NumberStatisticsDTO numberStatisticsDTO = new NumberStatisticsDTO();
         numberStatisticsDTO.setClick(clickInOneSecond);
         numberStatisticsDTO.setTrackback(trackbackInOneSecond);
+        numberStatisticsDTO.setCdtDevices(numCDTDevices.get());
         template.convertAndSend(EnumEndPoint.NUMBER_STATISTICS_ENDPOINT.getPath(), numberStatisticsDTO);
     }
 
@@ -49,5 +51,9 @@ public class StatisticService {
 
     public void addTrackBack() {
         numTrackbacks.incrementAndGet();
+    }
+
+    public void setCDTDevicesNum(long num) {
+        numCDTDevices.set(num);
     }
 }

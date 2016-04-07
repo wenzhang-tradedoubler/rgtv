@@ -7,6 +7,7 @@ public class NumberStatisticsDTO {
 
     private Long click;
     private Long trackback;
+    private Long cdtDevices;
 
     public Long getClick() {
         return click;
@@ -22,5 +23,13 @@ public class NumberStatisticsDTO {
 
     public void setTrackback(Long trackback) {
         this.trackback = trackback;
+    }
+
+    public void setCdtDevices(Long cdtDevices){
+        this.cdtDevices = cdtDevices;
+    }
+
+    public Long getCdtDevices() {
+        return cdtDevices;
     }
 }

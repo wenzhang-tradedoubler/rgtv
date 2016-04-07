@@ -27,7 +27,9 @@ stompNumberStatisticsClient.connect({ }, function(frame) {
         var data = JSON.parse(data.body);
         var numClicks = data.click;
         var numTrackbacks = data.trackback;
-        updateStatistics(numClicks, numTrackbacks);
+        var numCDTDevices = data.cdtDevices;
+//        updateStatistics(numClicks, numTrackbacks);
+        updateCDTDevices(numCDTDevices);
     });
 });
 
