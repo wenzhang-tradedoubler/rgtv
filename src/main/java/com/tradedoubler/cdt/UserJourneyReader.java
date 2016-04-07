@@ -30,7 +30,7 @@ public class UserJourneyReader extends Thread {
     private volatile boolean running;
     public UserJourneyReader(IUserJourneyListener listener) {
         String hosts = "localhost";
-        int port = 9045;
+        int port = 9042;
         Cluster cluster = Cluster.builder().withoutMetrics().addContactPoints(hosts).withPort(port).build();
         this.idMapperSession = cluster.connect("idmapperstore");
         this.running = true;
