@@ -18,7 +18,6 @@ import static org.slf4j.LoggerFactory.getLogger;
  */
 public class UserJourneyReader extends Thread {
     private final Logger LOGGER = getLogger(UserJourneyReader.class);
-    private static final String TEST_EXT_KEY = "CDT_RegressionTest_ExtId_1";
     private static final String SELECT = "Select * from ExtKeyToUserId where extkey = ?";
 
     private final Session idMapperSession;
@@ -42,7 +41,7 @@ public class UserJourneyReader extends Thread {
     public void run() {
         while (running) {
             try {
-                Iterator<Row> iterator = idMapperSession.execute(idMapperSelect.bind(TEST_EXT_KEY)).iterator();
+                Iterator<Row> iterator = idMapperSession.execute(idMapperSelect.bind(extkey)).iterator();
                 while (iterator.hasNext()) {
                     Row row = iterator.next();
                     ExternalKey externalKey = convert(row);
@@ -77,10 +76,10 @@ public class UserJourneyReader extends Thread {
         idMapperSession.shutdown();
     }
 
-    public static void main(String[] args) throws InterruptedException {
-        UserJourneyReader reader = new UserJourneyReader(null, "localhost", 9042, TEST_EXT_KEY);
-        reader.start();
-        reader.join();
-    }
+//    public static void main(String[] args) throws InterruptedException {
+//        UserJourneyReader reader = new UserJourneyReader(null, "localhost", 9042, "CDT_RegressionTest_ExtId_1");
+//        reader.start();
+//        reader.join();
+//    }
 
 }
