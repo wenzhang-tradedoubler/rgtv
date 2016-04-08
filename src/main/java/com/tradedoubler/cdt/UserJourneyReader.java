@@ -22,7 +22,7 @@ public class UserJourneyReader extends Thread {
 
     private final Session idMapperSession;
 
-    private final Set<ExternalKey> externalKeys = Sets.newHashSet();
+//    private final Set<ExternalKey> externalKeys = Sets.newHashSet();
     private final PreparedStatement idMapperSelect;
     private final IUserJourneyListener listener;
     private final String extkey;
@@ -42,14 +42,16 @@ public class UserJourneyReader extends Thread {
         while (running) {
             try {
                 Iterator<Row> iterator = idMapperSession.execute(idMapperSelect.bind(extkey)).iterator();
+                int ctr = 0;
                 while (iterator.hasNext()) {
                     Row row = iterator.next();
-                    ExternalKey externalKey = convert(row);
-                    externalKeys.add(externalKey);
+//                    ExternalKey externalKey = convert(row);
+//                    externalKeys.add(externalKey);
+                    ctr++;
                 }
-                LOGGER.info("Found " + externalKeys.size() + " linked devices");
+                LOGGER.info("Found " + ctr + " linked devices");
                 if (listener != null) {
-                    listener.onNumDevices(externalKeys.size());
+                    listener.onNumDevices(ctr);
                 }
             } catch (Throwable t) {
                 t.printStackTrace();
