@@ -26,7 +26,7 @@ $(function () {
                 }
             },
             title: {
-                text: 'Cross device links'
+                text: 'Cross device tracking'
             },
             xAxis: {
                 type: 'datetime',
@@ -34,7 +34,7 @@ $(function () {
             },
             yAxis: {
                 title: {
-                    text: 'Device linked'
+                    text: 'linked devices'
                 },
                 plotLines: [{
                     value: 0,

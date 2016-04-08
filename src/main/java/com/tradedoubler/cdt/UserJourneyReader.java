@@ -18,7 +18,7 @@ import static org.slf4j.LoggerFactory.getLogger;
  */
 public class UserJourneyReader extends Thread {
     private final Logger LOGGER = getLogger(UserJourneyReader.class);
-    private static final String CDT_DEMO_EXT_KEY = "CDT_RegressionTest_ExtId_5_1459867041197";
+    private static final String TEST_EXT_KEY = "CDT_RegressionTest_ExtId_1";
     private static final String SELECT = "Select * from ExtKeyToUserId where extkey = ?";
 
     private final Session idMapperSession;
@@ -26,23 +26,23 @@ public class UserJourneyReader extends Thread {
     private final Set<ExternalKey> externalKeys = Sets.newHashSet();
     private final PreparedStatement idMapperSelect;
     private final IUserJourneyListener listener;
+    private final String extkey;
 
     private volatile boolean running;
-    public UserJourneyReader(IUserJourneyListener listener) {
-        String hosts = "localhost";
-        int port = 9042;
-        Cluster cluster = Cluster.builder().withoutMetrics().addContactPoints(hosts).withPort(port).build();
+    public UserJourneyReader(IUserJourneyListener listener, String cassandraHosts, int cassandraPort, String extkey) {
+        Cluster cluster = Cluster.builder().withoutMetrics().addContactPoints(cassandraHosts).withPort(cassandraPort).build();
         this.idMapperSession = cluster.connect("idmapperstore");
         this.running = true;
         this.idMapperSelect = this.idMapperSession.prepare(SELECT);
         this.listener = listener;
+        this.extkey = extkey;
     }
 
     @Override
     public void run() {
         while (running) {
             try {
-                Iterator<Row> iterator = idMapperSession.execute(idMapperSelect.bind(CDT_DEMO_EXT_KEY)).iterator();
+                Iterator<Row> iterator = idMapperSession.execute(idMapperSelect.bind(TEST_EXT_KEY)).iterator();
                 while (iterator.hasNext()) {
                     Row row = iterator.next();
                     ExternalKey externalKey = convert(row);
@@ -78,7 +78,7 @@ public class UserJourneyReader extends Thread {
     }
 
     public static void main(String[] args) throws InterruptedException {
-        UserJourneyReader reader = new UserJourneyReader(null);
+        UserJourneyReader reader = new UserJourneyReader(null, "localhost", 9042, TEST_EXT_KEY);
         reader.start();
         reader.join();
     }

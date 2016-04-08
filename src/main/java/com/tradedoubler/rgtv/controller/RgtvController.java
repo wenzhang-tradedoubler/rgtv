@@ -9,6 +9,7 @@ import com.tradedoubler.rgtv.service.IPResolveService;
 import com.tradedoubler.rgtv.service.StatisticService;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.*;
@@ -38,6 +39,17 @@ public class RgtvController implements IUserJourneyListener {
     private SimpMessagingTemplate template;
 
     private final Random r = new Random();
+
+    @Value("${extkey}")
+    private String extkey;
+
+
+    @Value("${cassandra.hosts}")
+    private String cassandraHosts;
+
+
+    @Value("${cassandra.port}")
+    private int cassandraPort;
 
     @RequestMapping("/click")
     @ResponseStatus(HttpStatus.OK)
@@ -69,7 +81,8 @@ public class RgtvController implements IUserJourneyListener {
 
     @PostConstruct
     public void init(){
-        UserJourneyReader reader = new UserJourneyReader(this);
+        LOGGER.info("Start reading from cassandra "+cassandraHosts+":"+cassandraPort+", extkey:"+extkey);
+        UserJourneyReader reader = new UserJourneyReader(this, cassandraHosts, cassandraPort, extkey);
         reader.start();
     }
 
